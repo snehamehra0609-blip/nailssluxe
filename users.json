@@ -1,0 +1,50 @@
+[
+    {
+        "id": "usr_1782454106064",
+        "name": "Jane Doe",
+        "email": "jane@doe.com",
+        "salt": "e98afe20a9e98c2dc40155fe59390cf2",
+        "password": "5877891e16a5e27e9624e2303f5b4f07fa44fbdb911cd41f3291f89dfb630910861925f2d5eddd9839dec80226658df8af0ad4fa1699b995723d355217bbe6f2",
+        "createdAt": "2026-06-26T06:08:26.064Z"
+    },
+    {
+        "id": "usr_1782456137081",
+        "name": "Test User",
+        "email": "test@test.com",
+        "salt": "972e8499240d96a046def656ca48ac6f",
+        "password": "4b762e7c30e1639ce108ebf9b1344e9c2bcd069c8264a8c4081f00d6f1ed7378554c825f261a7422e08a55f23f930ada9cfb250a5a9cd0aa91479c904ffefd79",
+        "createdAt": "2026-06-26T06:42:17.082Z"
+    },
+    {
+        "id": "usr_1782458954170",
+        "name": "sneha",
+        "email": "sneha0609@gmail.com",
+        "salt": "12e92d6c4827b14090acefec6977acf6",
+        "password": "71db445292a822e48935b8da87764d5b1ea372d7cd4a74c70e3c6fd4c649d1986418fd6270aa5c966f0ad9ac8a8ce2670aa9fee3c6a65e2ffac8fc4b1d9a2c81",
+        "createdAt": "2026-06-26T07:29:14.171Z"
+    },
+    {
+        "id": "usr_1782916748753",
+        "name": "Browser Test",
+        "email": "browser_test@test.com",
+        "salt": "4b27224fe0541aec7bed9a6cc7791073",
+        "password": "155bbfc6098a2ba02335cc8ceb30e23621c3d7e097ba0204f87a4fb3a9ec67aa3818f68e417bc9b6d5fe2f802ae140526385b091f4e6a6cc25890a489faf9457",
+        "createdAt": "2026-07-01T14:39:08.753Z"
+    },
+    {
+        "id": "usr_1782919846604",
+        "name": "API Test User",
+        "email": "test_1782919846587@example.com",
+        "salt": "f2d6af5be8bc176c43a7a6a9d3ad8532",
+        "password": "1f70b23dc00253c68c9b9ea3d484938261378f8bb1556cf50c0c0f40c82a4a493a28918cb50ce3f636655115ae6a89864422bdb7b92e2873415b638a9ec3cf04",
+        "createdAt": "2026-07-01T15:30:46.604Z"
+    },
+    {
+        "id": "usr_1782920111007",
+        "name": "aaa",
+        "email": "sss@gmail.com",
+        "salt": "b5fe68ee16e4682958ae609c31185355",
+        "password": "71d79b2a38f0fdffb1131018a9016a007084b92107b9ea260d0f2ae087092224d6a5d90fd788b6675a0d142245a1291d274d152140741ed12ee8ba5e7182410b",
+        "createdAt": "2026-07-01T15:35:11.007Z"
+    }
+]
