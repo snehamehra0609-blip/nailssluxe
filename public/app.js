@@ -2,9 +2,9 @@
    NAILSS LUXE - APPLICATION ENGINE
    ========================================== */
 
-const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
-  ? '' 
-  : 'https://YOUR_LIVE_BACKEND_URL_HERE';
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? ''
+    : 'https://YOUR_LIVE_BACKEND_URL_HERE';
 
 // 1. DATA AND STATES
 let PRODUCTS_DATA = [
@@ -209,7 +209,7 @@ function initNavigation() {
             e.preventDefault();
             const target = trig.getAttribute("data-target");
             switchTab(target);
-            
+
             // Close drawer if open
             if (mobileDrawer) mobileDrawer.classList.remove("active");
             if (drawerOverlay) drawerOverlay.classList.remove("active");
@@ -225,7 +225,7 @@ function initNavigation() {
         }
     }
 
-  // Safe Drawer triggers check
+    // Safe Drawer triggers check
     if (menuToggle && mobileDrawer && drawerOverlay && drawerClose) {
         menuToggle.addEventListener("click", () => {
             mobileDrawer.classList.add("active");
@@ -300,7 +300,7 @@ function initECommerce() {
         input.addEventListener("change", () => {
             const category = input.name;
             const value = input.value;
-            
+
             if (input.checked) {
                 activeFilters[category].push(value);
             } else {
@@ -362,9 +362,9 @@ function renderProductGrid() {
 
     const filtered = getFilteredProducts();
     const countEl = document.getElementById("productCount");
-    
+
     countEl.textContent = `Showing ${filtered.length} sets`;
-    
+
     if (filtered.length === 0) {
         grid.innerHTML = `<div class="no-results">No sets match the selected filter combinations.</div>`;
         return;
@@ -497,7 +497,7 @@ function openQuickView(productId) {
         const shape = document.getElementById("qvShape").value;
         const length = document.getElementById("qvLength").value;
         const sizing = document.getElementById("qvSizing").value;
-        
+
         let specString = `Shape: ${shape} | Length: ${length} | Sizing: ${sizing}`;
         let itemMeasurements = null;
 
@@ -538,7 +538,7 @@ function getNailSVGMarkup(shape, length, baseColor, artTier, uniqueId = "default
     let nailWidth = 40; // average
     let cuticleY = 220;
     let nailTopY = cuticleY - nailHeight;
-    
+
     // SVG definitions: polish linear gradient
     let gradDef = `
         <defs>
@@ -555,11 +555,11 @@ function getNailSVGMarkup(shape, length, baseColor, artTier, uniqueId = "default
 
     // Visual elements
     let drawPath = "";
-    
+
     // Left Cuticle Corner: (50 - w/2, cuticleY)
     // Right Cuticle Corner: (50 + w/2, cuticleY)
-    let leftCuticleX = 50 - nailWidth/2;
-    let rightCuticleX = 50 + nailWidth/2;
+    let leftCuticleX = 50 - nailWidth / 2;
+    let rightCuticleX = 50 + nailWidth / 2;
     let baseCuticleControlY = cuticleY + 12;
 
     if (shape === "Square") {
@@ -567,33 +567,33 @@ function getNailSVGMarkup(shape, length, baseColor, artTier, uniqueId = "default
         drawPath = `M ${leftCuticleX} ${nailTopY} 
                     L ${rightCuticleX} ${nailTopY} 
                     L ${rightCuticleX} ${cuticleY} 
-                    A ${nailWidth/2} 15 0 0 1 ${leftCuticleX} ${cuticleY} 
+                    A ${nailWidth / 2} 15 0 0 1 ${leftCuticleX} ${cuticleY} 
                     Z`;
     } else if (shape === "Coffin") {
         // Tapered in slightly, then flat top
         let topWidth = nailWidth * 0.45;
-        let topLeftX = 50 - topWidth/2;
-        let topRightX = 50 + topWidth/2;
+        let topLeftX = 50 - topWidth / 2;
+        let topRightX = 50 + topWidth / 2;
         drawPath = `M ${topLeftX} ${nailTopY} 
                     L ${topRightX} ${nailTopY} 
                     L ${rightCuticleX} ${cuticleY} 
-                    A ${nailWidth/2} 15 0 0 1 ${leftCuticleX} ${cuticleY} 
+                    A ${nailWidth / 2} 15 0 0 1 ${leftCuticleX} ${cuticleY} 
                     Z`;
     } else if (shape === "Almond") {
         // Curved and rounded at top center point
         let curveTopY = nailTopY - 12;
-        drawPath = `M ${leftCuticleX} ${cuticleY - nailHeight*0.4}
+        drawPath = `M ${leftCuticleX} ${cuticleY - nailHeight * 0.4}
                     C ${leftCuticleX} ${nailTopY} 32 ${curveTopY} 50 ${curveTopY}
-                    C 68 ${curveTopY} ${rightCuticleX} ${nailTopY} ${rightCuticleX} ${cuticleY - nailHeight*0.4}
+                    C 68 ${curveTopY} ${rightCuticleX} ${nailTopY} ${rightCuticleX} ${cuticleY - nailHeight * 0.4}
                     L ${rightCuticleX} ${cuticleY}
-                    A ${nailWidth/2} 15 0 0 1 ${leftCuticleX} ${cuticleY}
+                    A ${nailWidth / 2} 15 0 0 1 ${leftCuticleX} ${cuticleY}
                     Z`;
     } else if (shape === "Stiletto") {
         // Sharp point meeting at top center
         let pointTopY = nailTopY - 22;
         drawPath = `M 50 ${pointTopY}
                     L ${rightCuticleX} ${cuticleY - 10}
-                    A ${nailWidth/2} 15 0 0 1 ${leftCuticleX} ${cuticleY - 10}
+                    A ${nailWidth / 2} 15 0 0 1 ${leftCuticleX} ${cuticleY - 10}
                     Z`;
     }
 
@@ -641,11 +641,11 @@ function getNailSVGMarkup(shape, length, baseColor, artTier, uniqueId = "default
 // Renders a horizontal row of 5 fingers/nails representing a full hand manicure
 function getMiniHandHTML(shape, length, nailColor, artStyle, uniqueId) {
     const fingers = [
-        { name: "thumb",  cx: 30,  cy: 125, w: 26, nailW: 22, lengthScale: 0.82 },
-        { name: "index",  cx: 70,  cy: 95,  w: 20, nailW: 16, lengthScale: 0.95 },
-        { name: "middle", cx: 110, cy: 85,  w: 21, nailW: 17, lengthScale: 1.05 },
-        { name: "ring",   cx: 150, cy: 95,  w: 20, nailW: 16, lengthScale: 0.98 },
-        { name: "pinky",  cx: 190, cy: 115, w: 16, nailW: 12, lengthScale: 0.78 }
+        { name: "thumb", cx: 30, cy: 125, w: 26, nailW: 22, lengthScale: 0.82 },
+        { name: "index", cx: 70, cy: 95, w: 20, nailW: 16, lengthScale: 0.95 },
+        { name: "middle", cx: 110, cy: 85, w: 21, nailW: 17, lengthScale: 1.05 },
+        { name: "ring", cx: 150, cy: 95, w: 20, nailW: 16, lengthScale: 0.98 },
+        { name: "pinky", cx: 190, cy: 115, w: 16, nailW: 12, lengthScale: 0.78 }
     ];
 
     let fingerHTML = "";
@@ -653,10 +653,10 @@ function getMiniHandHTML(shape, length, nailColor, artStyle, uniqueId) {
 
     fingers.forEach((f, idx) => {
         const fingerTopY = f.cy - 8;
-        const pathD = `M ${f.cx - f.w/2} 180 
-                       L ${f.cx - f.w/2} ${fingerTopY} 
-                       A ${f.w/2} ${f.w/2} 0 0 1 ${f.cx + f.w/2} ${fingerTopY} 
-                       L ${f.cx + f.w/2} 180 
+        const pathD = `M ${f.cx - f.w / 2} 180 
+                       L ${f.cx - f.w / 2} ${fingerTopY} 
+                       A ${f.w / 2} ${f.w / 2} 0 0 1 ${f.cx + f.w / 2} ${fingerTopY} 
+                       L ${f.cx + f.w / 2} 180 
                        Z`;
         fingerHTML += `<path d="${pathD}" fill="#161211" stroke="rgba(212, 175, 55, 0.12)" stroke-width="1.2" />`;
 
@@ -681,12 +681,12 @@ function getMiniHandHTML(shape, length, nailColor, artStyle, uniqueId) {
 
 // Helpers
 function lightenColor(color, percent) {
-    let num = parseInt(color.replace("#",""), 16),
-    amt = Math.round(2.55 * percent),
-    R = (num >> 16) + amt,
-    G = (num >> 8 & 0x00FF) + amt,
-    B = (num & 0x0000FF) + amt;
-    return "#" + (0x1000000 + (R<255?R<0?0:R:255)*0x10000 + (G<255?G<0?0:G:255)*0x100 + (B<255?B<0?0:B:255)).toString(16).slice(1);
+    let num = parseInt(color.replace("#", ""), 16),
+        amt = Math.round(2.55 * percent),
+        R = (num >> 16) + amt,
+        G = (num >> 8 & 0x00FF) + amt,
+        B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R < 255 ? R < 0 ? 0 : R : 255) * 0x10000 + (G < 255 ? G < 0 ? 0 : G : 255) * 0x100 + (B < 255 ? B < 0 ? 0 : B : 255)).toString(16).slice(1);
 }
 
 
@@ -720,13 +720,13 @@ function initCustomBuilder() {
         const lengthsList = ["Short", "Medium", "Long", "XL"];
         const index = parseInt(e.target.value) - 1;
         builderConfig.length = lengthsList[index];
-        
+
         // Update slider labels active class
         const ticks = document.querySelectorAll(".slider-tick");
         ticks.forEach((tick, idx) => {
             tick.classList.toggle("active", idx === index);
         });
-        
+
         triggerBuilderUpdate();
     });
 
@@ -817,8 +817,8 @@ function initCustomBuilder() {
     // Add Builder product to cart
     btnBuilderAddToCart.addEventListener("click", () => {
         const itemPrice = builderConfig.artPriceAdd;
-        const sizingDesc = builderConfig.sizeMode === "preset" 
-            ? `${builderConfig.presetSize} Preset` 
+        const sizingDesc = builderConfig.sizeMode === "preset"
+            ? `${builderConfig.presetSize} Preset`
             : `Custom: (${builderConfig.customSizes.join(", ")} mm)`;
 
         addToCart({
@@ -870,11 +870,11 @@ function triggerBuilderUpdate() {
 
 function updateBuilderPreviewCanvas() {
     const fingers = ["thumb", "index", "middle", "ring", "pinky"];
-    
+
     fingers.forEach((finger, index) => {
         const svgEl = document.querySelector(`.nail-finger[data-finger='${finger}'] .nail-svg`);
         const mmLabel = document.getElementById(`val-${finger}`);
-        
+
         const widthVal = builderConfig.customSizes[index];
         mmLabel.textContent = `${widthVal}mm`;
 
@@ -887,14 +887,14 @@ function updateBuilderPreviewCanvas() {
 function updateBuilderPricingUI() {
     const priceEl = document.getElementById("builderDynamicPrice");
     const summaryEl = document.getElementById("builderSummarySpecs");
-    
+
     if (!priceEl || !summaryEl) return;
 
-    const baseCost = builderConfig.artPriceAdd; 
+    const baseCost = builderConfig.artPriceAdd;
     priceEl.textContent = formatPrice(baseCost);
 
-    const sizeText = builderConfig.sizeMode === "preset" 
-        ? builderConfig.presetSize 
+    const sizeText = builderConfig.sizeMode === "preset"
+        ? builderConfig.presetSize
         : "Custom";
 
     summaryEl.textContent = `${builderConfig.shape} • ${builderConfig.length} • Sizing: ${sizeText} • ${builderConfig.artTier}`;
@@ -960,10 +960,10 @@ function closeCartDrawer() {
 
 function addToCart(item) {
     // Check duplication
-    const duplicate = cart.find(i => 
-        i.productId === item.productId && 
-        i.shape === item.shape && 
-        i.length === item.length && 
+    const duplicate = cart.find(i =>
+        i.productId === item.productId &&
+        i.shape === item.shape &&
+        i.length === item.length &&
         i.sizing === item.sizing &&
         i.artTier === item.artTier
     );
@@ -973,7 +973,7 @@ function addToCart(item) {
     } else {
         cart.push(item);
     }
-    
+
     saveCart();
     updateCartUI();
 }
@@ -1118,7 +1118,7 @@ const BLOG_ARTICLES = {
 
 function initBlog() {
     const readBtns = document.querySelectorAll(".read-blog-trigger");
-    
+
     readBtns.forEach(btn => {
         btn.addEventListener("click", () => {
             const articleId = btn.getAttribute("data-article");
@@ -1165,7 +1165,7 @@ function initSupport() {
 
             const inquiryPayload = { name, email, orderRef, message };
 
-            fetch(`${BACKEND_URL}/api/inquiries`, {
+            fetch(`${BACKEND_URL}'https://nailss-luxe-backend.onrender.com/api/inquiries', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1245,7 +1245,7 @@ function initWhatsApp() {
 
         const userMsg = document.createElement("div");
         userMsg.className = "message outgoing";
-        userMsg.innerHTML = `<p>${escapeHTML(text)}</p><span class="msg-time">${getCurrentTime()}</span>`;
+        userMsg.innerHTML = `< p > ${ escapeHTML(text) }</p > <span class="msg-time">${getCurrentTime()}</span>`;
         messagesContainer.appendChild(userMsg);
 
         chatInput.value = "";
@@ -1262,7 +1262,7 @@ function initWhatsApp() {
                 replyText = "We offer express shipping across India and worldwide! Free domestic delivery kicks in for orders over ₹1,500. Shipping takes 2-4 business days.";
             }
 
-            autoResponse.innerHTML = `<p>${replyText}</p><span class="msg-time">${getCurrentTime()}</span>`;
+            autoResponse.innerHTML = `< p > ${ replyText }</p > <span class="msg-time">${getCurrentTime()}</span>`;
             messagesContainer.appendChild(autoResponse);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 1200);
@@ -1327,11 +1327,11 @@ function initSizingConverter() {
         
         // If differences are low, suggest the preset
         if (minDiff <= 5) {
-            resultSize.textContent = `${bestPreset} Preset (Perfect fit, deviation ${minDiff}mm)`;
+            resultSize.textContent = `${ bestPreset } Preset(Perfect fit, deviation ${ minDiff }mm)`;
             btnApply.style.display = "inline-block";
             btnApply.setAttribute("data-preset", bestPreset);
         } else {
-            resultSize.textContent = `Custom Sizing (${thumb}, ${index}, ${middle}, ${ring}, ${pinky} mm)`;
+            resultSize.textContent = `Custom Sizing(${ thumb }, ${ index }, ${ middle }, ${ ring }, ${ pinky } mm)`;
             btnApply.style.display = "inline-block";
             btnApply.setAttribute("data-preset", "Custom");
             btnApply.setAttribute("data-sizes", JSON.stringify(inputs));
@@ -1750,27 +1750,27 @@ function initCheckoutFlow() {
         
         // Populate Order Review
         document.getElementById("reviewDestName").textContent = checkoutState.name;
-        document.getElementById("reviewDestAddress").textContent = `${checkoutState.address}, ${checkoutState.city} ${checkoutState.zip}, ${checkoutState.country}`;
+        document.getElementById("reviewDestAddress").textContent = `${ checkoutState.address }, ${ checkoutState.city } ${ checkoutState.zip }, ${ checkoutState.country }`;
         
         const methodText = checkoutState.shippingMethod === "express" ? "Express Delivery (DHL/FedEx)" : "Standard Insured Delivery";
         let paymentText = "";
         if (checkoutState.paymentMethod === "card") {
             const cardNum = document.getElementById("cardNum").value;
             const last4 = cardNum.substring(cardNum.length - 4) || "4444";
-            paymentText = `Credit Card (ending in ${last4})`;
+            paymentText = `Credit Card(ending in ${ last4 })`;
         } else {
             paymentText = checkoutState.paymentMethod;
         }
-        document.getElementById("reviewMethodDetails").textContent = `${methodText} &bull; ${paymentText}`;
+        document.getElementById("reviewMethodDetails").textContent = `${ methodText } & bull; ${ paymentText } `;
         
         // Render item list
         const reviewList = document.getElementById("reviewItemsList");
         reviewList.innerHTML = cart.map(item => `
-            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary);">
+                < div style = "display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary);" >
                 <span>${item.qty}x ${item.name} (${item.shape} &bull; ${item.length})</span>
                 <span>${formatPrice(item.price * item.qty)}</span>
-            </div>
-        `).join("");
+            </div >
+                `).join("");
         
         // Price summaries
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
@@ -1826,45 +1826,45 @@ function initCheckoutFlow() {
         };
 
         // Call backend API with fetch, fallback to offline local logic on error
-        fetch(`${BACKEND_URL}/api/orders`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(orderPayload)
-        })
-        .then(response => {
-            if (!response.ok) throw new Error("Server error");
-            return response.json();
-        })
-        .then(data => {
-            console.log("Order persisted to backend:", data);
-            displaySuccessState(ref);
-        })
-        .catch(err => {
-            console.warn("Backend unavailable. Falling back to client local storage simulation.", err);
-            // Save to offline order log in localStorage
-            let offlineOrders = JSON.parse(localStorage.getItem("nailss_luxe_offline_orders") || "[]");
-            offlineOrders.push(orderPayload);
-            localStorage.setItem("nailss_luxe_offline_orders", JSON.stringify(offlineOrders));
-            
-            displaySuccessState(ref);
-        });
+        fetch(`${ BACKEND_URL } 'https://nailss-luxe-backend.onrender.com/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderPayload)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error("Server error");
+                return response.json();
+            })
+            .then(data => {
+                console.log("Order persisted to backend:", data);
+                displaySuccessState(ref);
+            })
+            .catch(err => {
+                console.warn("Backend unavailable. Falling back to client local storage simulation.", err);
+                // Save to offline order log in localStorage
+                let offlineOrders = JSON.parse(localStorage.getItem("nailss_luxe_offline_orders") || "[]");
+                offlineOrders.push(orderPayload);
+                localStorage.setItem("nailss_luxe_offline_orders", JSON.stringify(offlineOrders));
+
+                displaySuccessState(ref);
+            });
 
         function displaySuccessState(refNum) {
             document.getElementById("successRefNum").textContent = refNum;
-            
+
             // Est delivery date (+4 days)
             const date = new Date();
             date.setDate(date.getDate() + 4);
             const options = { month: 'long', day: 'numeric', year: 'numeric' };
             document.getElementById("successDeliveryDate").textContent = date.toLocaleDateString('en-US', options);
-            
+
             // Hide review, show success
             reviewArea.classList.add("hidden");
             successArea.classList.remove("hidden");
             tabConfirm.style.color = "var(--text-secondary)";
-            
+
             // Clear cart globally
             cart = [];
             saveCart();
@@ -1876,7 +1876,7 @@ function initCheckoutFlow() {
         checkoutDrawer.classList.remove("active");
         cartOverlay.classList.remove("active");
         resetCheckoutDrawer();
-        
+
         // Route back to home tab
         document.querySelectorAll(".page-section").forEach(sec => sec.classList.remove("active"));
         document.getElementById("home").classList.add("active");
@@ -1930,7 +1930,7 @@ function initAuth() {
     const authModal = document.getElementById("authModal");
     const authModalOverlay = document.getElementById("authModalOverlay");
     const authModalClose = document.getElementById("authModalClose");
-    
+
     const accountTrigger = document.getElementById("accountTrigger");
     const mobileAccountLink = document.getElementById("mobileAccountLink");
     const userGreetingPill = document.getElementById("userGreetingPill");
@@ -1965,10 +1965,10 @@ function initAuth() {
             // User is logged in
             userGreetingPill.textContent = currentUser.name.split(' ')[0];
             userGreetingPill.style.display = "block";
-            
+
             authLoggedOutState.style.display = "none";
             authLoggedInState.style.display = "block";
-            
+
             dashboardAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
             dashboardTitle.textContent = `Bonjour, ${currentUser.name}!`;
             dashboardEmail.textContent = currentUser.email;
@@ -1980,7 +1980,7 @@ function initAuth() {
             // User is logged out
             userGreetingPill.style.display = "none";
             userGreetingPill.textContent = "";
-            
+
             authLoggedOutState.style.display = "block";
             authLoggedInState.style.display = "none";
 
@@ -2008,7 +2008,7 @@ function initAuth() {
     function fetchOrderHistory() {
         if (!currentUser) return;
         dashboardOrderList.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;">Loading order history...</p>`;
-        
+
         fetch(`${BACKEND_URL}/api/orders/customer?email=${encodeURIComponent(currentUser.email)}`)
             .then(res => {
                 if (!res.ok) throw new Error("Failed to load orders");
@@ -2029,7 +2029,7 @@ function initAuth() {
 
                     // Construct items description
                     const itemsDesc = order.items.map(item => `${item.qty}x ${item.name} (${item.shape}, ${item.length})`).join('<br>');
-                    
+
                     return `
                         <div class="order-history-card">
                             <div class="order-card-header">
@@ -2098,37 +2098,38 @@ function initAuth() {
         loginStatus.style.color = "var(--text-secondary)";
         loginStatus.textContent = "Logging in...";
 
-        fetch(`${BACKEND_URL}/api/auth/login`, {            method: 'POST',
+        fetch(`${BACKEND_URL}/api/auth/login`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(errData => {
-                    throw new Error(errData.error || "Authentication failed");
-                });
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (data.success) {
-                currentUser = data.user;
-                localStorage.setItem('nailss_luxe_user', JSON.stringify(currentUser));
-                updateUIState();
-                loginStatus.className = "form-status-message success";
-                loginStatus.style.color = "#81c784";
-                loginStatus.textContent = "Login successful!";
-                
-                setTimeout(() => {
-                    toggleAuthModal(false);
-                }, 1000);
-            }
-        })
-        .catch(err => {
-            loginStatus.className = "form-status-message";
-            loginStatus.style.color = "#e57373";
-            loginStatus.textContent = err.message;
-        });
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(errData => {
+                        throw new Error(errData.error || "Authentication failed");
+                    });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    currentUser = data.user;
+                    localStorage.setItem('nailss_luxe_user', JSON.stringify(currentUser));
+                    updateUIState();
+                    loginStatus.className = "form-status-message success";
+                    loginStatus.style.color = "#81c784";
+                    loginStatus.textContent = "Login successful!";
+
+                    setTimeout(() => {
+                        toggleAuthModal(false);
+                    }, 1000);
+                }
+            })
+            .catch(err => {
+                loginStatus.className = "form-status-message";
+                loginStatus.style.color = "#e57373";
+                loginStatus.textContent = err.message;
+            });
     });
 
     // Submit Logic: Register Form
@@ -2154,34 +2155,34 @@ function initAuth() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
         })
-        .then(res => {
-            if (!res.ok) {
-                return res.json().then(errData => {
-                    throw new Error(errData.error || "Registration failed");
-                });
-            }
-            return res.json();
-        })
-        .then(data => {
-            if (data.success) {
-                registerStatus.className = "form-status-message success";
-                registerStatus.style.color = "#81c784";
-                registerStatus.textContent = "Registration successful! Logging in...";
-                
-                currentUser = data.user;
-                localStorage.setItem('nailss_luxe_user', JSON.stringify(currentUser));
-                updateUIState();
-                
-                setTimeout(() => {
-                    toggleAuthModal(false);
-                }, 1500);
-            }
-        })
-        .catch(err => {
-            registerStatus.className = "form-status-message";
-            registerStatus.style.color = "#e57373";
-            registerStatus.textContent = err.message;
-        });
+            .then(res => {
+                if (!res.ok) {
+                    return res.json().then(errData => {
+                        throw new Error(errData.error || "Registration failed");
+                    });
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    registerStatus.className = "form-status-message success";
+                    registerStatus.style.color = "#81c784";
+                    registerStatus.textContent = "Registration successful! Logging in...";
+
+                    currentUser = data.user;
+                    localStorage.setItem('nailss_luxe_user', JSON.stringify(currentUser));
+                    updateUIState();
+
+                    setTimeout(() => {
+                        toggleAuthModal(false);
+                    }, 1500);
+                }
+            })
+            .catch(err => {
+                registerStatus.className = "form-status-message";
+                registerStatus.style.color = "#e57373";
+                registerStatus.textContent = err.message;
+            });
     });
 
     // Logout Logic
