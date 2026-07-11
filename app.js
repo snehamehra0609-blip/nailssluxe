@@ -1165,35 +1165,35 @@ function initSupport() {
 
             const inquiryPayload = { name, email, orderRef, message };
 
-            fetch(`${BACKEND_URL}'https://nailss-luxe-backend.onrender.com/api/inquiries', {
+            fetch('https://nailss-luxe-backend.onrender.com/api/inquiries', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify(inquiryPayload)
             })
-            .then(res => {
-                if (!res.ok) throw new Error("Inquiry submission failed");
-                return res.json();
-            })
-            .then(data => {
-                console.log("Inquiry persisted to backend:", data);
-                status.textContent = "Thank you! Your inquiry has been sent to our backend and saved successfully.";
-                status.classList.add("success");
-                form.reset();
-            })
-            .catch(err => {
-                console.warn("Backend unavailable. Falling back to offline client log.", err);
-                
-                // Save to local storage for offline inquiries
-                let offlineInquiries = JSON.parse(localStorage.getItem("nailss_luxe_offline_inquiries") || "[]");
-                offlineInquiries.push({ ...inquiryPayload, timestamp: new Date().toISOString() });
-                localStorage.setItem("nailss_luxe_offline_inquiries", JSON.stringify(offlineInquiries));
+                .then(res => {
+                    if (!res.ok) throw new Error("Inquiry submission failed");
+                    return res.json();
+                })
+                .then(data => {
+                    console.log("Inquiry persisted to backend:", data);
+                    status.textContent = "Thank you! Your inquiry has been sent to our backend and saved successfully.";
+                    status.classList.add("success");
+                    form.reset();
+                })
+                .catch(err => {
+                    console.warn("Backend unavailable. Falling back to offline client log.", err);
 
-                status.textContent = "Thank you! Your message has been saved in local browser storage (offline mode) and will sync when online.";
-                status.classList.add("success");
-                form.reset();
-            });
+                    // Save to local storage for offline inquiries
+                    let offlineInquiries = JSON.parse(localStorage.getItem("nailss_luxe_offline_inquiries") || "[]");
+                    offlineInquiries.push({ ...inquiryPayload, timestamp: new Date().toISOString() });
+                    localStorage.setItem("nailss_luxe_offline_inquiries", JSON.stringify(offlineInquiries));
+
+                    status.textContent = "Thank you! Your message has been saved in local browser storage (offline mode) and will sync when online.";
+                    status.classList.add("success");
+                    form.reset();
+                });
         });
     }
 
@@ -1245,7 +1245,7 @@ function initWhatsApp() {
 
         const userMsg = document.createElement("div");
         userMsg.className = "message outgoing";
-        userMsg.innerHTML = `< p > ${ escapeHTML(text) }</p > <span class="msg-time">${getCurrentTime()}</span>`;
+        userMsg.innerHTML = `< p > ${escapeHTML(text)}</p > <span class="msg-time">${getCurrentTime()}</span>`;
         messagesContainer.appendChild(userMsg);
 
         chatInput.value = "";
@@ -1254,7 +1254,7 @@ function initWhatsApp() {
         setTimeout(() => {
             const autoResponse = document.createElement("div");
             autoResponse.className = "message incoming";
-            
+
             let replyText = "Hello! A specialist is checking custom designs at the moment. Can you confirm your size presets or send your Sizing Kit reference code?";
             if (text.toLowerCase().includes("size") || text.toLowerCase().includes("measure")) {
                 replyText = "Got it! Standard presets (XS-L) fit 85% of clients. You can measure your nails with household tape or purchase a Sizing Kit (₹100 with free shipping).";
@@ -1262,7 +1262,7 @@ function initWhatsApp() {
                 replyText = "We offer express shipping across India and worldwide! Free domestic delivery kicks in for orders over ₹1,500. Shipping takes 2-4 business days.";
             }
 
-            autoResponse.innerHTML = `< p > ${ replyText }</p > <span class="msg-time">${getCurrentTime()}</span>`;
+            autoResponse.innerHTML = `< p > ${replyText}</p > <span class="msg-time">${getCurrentTime()}</span>`;
             messagesContainer.appendChild(autoResponse);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }, 1200);
@@ -1281,7 +1281,7 @@ function initWhatsApp() {
     }
 
     function escapeHTML(str) {
-        return str.replace(/[&<>'"]/g, 
+        return str.replace(/[&<>'"]/g,
             tag => ({
                 '&': '&amp;',
                 '<': '&lt;',
@@ -1298,7 +1298,7 @@ function initSizingConverter() {
     const btnCalc = document.getElementById("btnCalculatePreset");
     const btnApply = document.getElementById("btnApplyCalcToBuilder");
     const resultSize = document.getElementById("calcResultSize");
-    
+
     if (!btnCalc) return;
 
     btnCalc.addEventListener("click", () => {
@@ -1307,13 +1307,13 @@ function initSizingConverter() {
         const middle = parseInt(document.getElementById("calcMiddle").value) || 13;
         const ring = parseInt(document.getElementById("calcRing").value) || 11;
         const pinky = parseInt(document.getElementById("calcPinky").value) || 10;
-        
+
         const inputs = [thumb, index, middle, ring, pinky];
-        
+
         // Find best preset size match
         let bestPreset = "XS";
         let minDiff = Infinity;
-        
+
         Object.entries(SIZES_MAP).forEach(([preset, sizes]) => {
             let diff = 0;
             for (let i = 0; i < 5; i++) {
@@ -1324,14 +1324,14 @@ function initSizingConverter() {
                 bestPreset = preset;
             }
         });
-        
+
         // If differences are low, suggest the preset
         if (minDiff <= 5) {
-            resultSize.textContent = `${ bestPreset } Preset(Perfect fit, deviation ${ minDiff }mm)`;
+            resultSize.textContent = `${bestPreset} Preset(Perfect fit, deviation ${minDiff}mm)`;
             btnApply.style.display = "inline-block";
             btnApply.setAttribute("data-preset", bestPreset);
         } else {
-            resultSize.textContent = `Custom Sizing(${ thumb }, ${ index }, ${ middle }, ${ ring }, ${ pinky } mm)`;
+            resultSize.textContent = `Custom Sizing(${thumb}, ${index}, ${middle}, ${ring}, ${pinky} mm)`;
             btnApply.style.display = "inline-block";
             btnApply.setAttribute("data-preset", "Custom");
             btnApply.setAttribute("data-sizes", JSON.stringify(inputs));
@@ -1340,7 +1340,7 @@ function initSizingConverter() {
 
     btnApply.addEventListener("click", () => {
         const preset = btnApply.getAttribute("data-preset");
-        
+
         // Open Custom Builder tab
         document.querySelectorAll(".page-section").forEach(sec => sec.classList.remove("active"));
         document.getElementById("builder").classList.add("active");
@@ -1350,14 +1350,14 @@ function initSizingConverter() {
                 link.classList.add("active");
             }
         });
-        
+
         // Close modal
         document.getElementById("sizingGuideModal").classList.remove("active");
-        
+
         // Apply sizing
         const btnPresetMode = document.getElementById("btnPresetSize");
         const btnCustomMode = document.getElementById("btnCustomSize");
-        
+
         if (preset === "Custom") {
             btnCustomMode.click();
             const sizes = JSON.parse(btnApply.getAttribute("data-sizes"));
@@ -1376,7 +1376,7 @@ function initSizingConverter() {
                 }
             });
         }
-        
+
         triggerBuilderUpdate();
         window.scrollTo({ top: document.getElementById("builder").offsetTop - 100, behavior: "smooth" });
     });
@@ -1393,7 +1393,7 @@ function initReelsPlayer() {
     const shopTitle = document.getElementById("reelShopNailTitle");
     const quickShopBtn = document.getElementById("btnReelQuickShop");
     const videoPlayer = document.getElementById("reelVideoPlayer");
-    
+
     if (!reelModal) return;
 
     // Simulated reel datasets mapped to actual video assets
@@ -1440,17 +1440,17 @@ function initReelsPlayer() {
 
             captionText.textContent = data.caption;
             shopTitle.textContent = data.productName;
-            
+
             // Set dynamic SVG icon in shop tag
             shopSvg.innerHTML = getNailSVGMarkup(data.shape, "Medium", data.color, data.art, "reel_icon_" + reelId);
-            
+
             // Load and play the real video in lightbox
             if (videoPlayer) {
                 videoPlayer.src = data.videoSrc;
                 videoPlayer.load();
                 videoPlayer.play().catch(err => console.log("Video auto-play blocked or failed:", err));
             }
-            
+
             // Configure quick shop link
             quickShopBtn.onclick = (e) => {
                 e.preventDefault();
@@ -1459,7 +1459,7 @@ function initReelsPlayer() {
                     videoPlayer.pause();
                     videoPlayer.src = "";
                 }
-                
+
                 // Route to shop or builder
                 if (data.productName.includes("Bespoke") || data.productName.includes("Custom") || data.productName.includes("Dragon")) {
                     // Route to custom builder tab
@@ -1471,11 +1471,11 @@ function initReelsPlayer() {
                             link.classList.add("active");
                         }
                     });
-                    
+
                     // Set builder to match this design
                     builderConfig.shape = data.shape;
                     builderConfig.artTier = data.art;
-                    
+
                     // Update visual builder active states
                     document.querySelectorAll(".shape-opt").forEach(opt => {
                         opt.classList.toggle("active", opt.getAttribute("data-shape") === data.shape);
@@ -1483,7 +1483,7 @@ function initReelsPlayer() {
                     document.querySelectorAll(".art-opt").forEach(opt => {
                         opt.classList.toggle("active", opt.getAttribute("data-art") === data.art);
                     });
-                    
+
                     triggerBuilderUpdate();
                     window.scrollTo({ top: document.getElementById("builder").offsetTop - 100, behavior: "smooth" });
                 } else {
@@ -1551,12 +1551,12 @@ function initCheckoutFlow() {
     const checkoutClose = document.getElementById("checkoutDrawerClose");
     const cartDrawer = document.getElementById("cartDrawer");
     const cartOverlay = document.getElementById("cartOverlay");
-    
+
     const shippingForm = document.getElementById("checkoutShippingForm");
     const paymentArea = document.getElementById("checkoutPaymentArea");
     const reviewArea = document.getElementById("checkoutReviewArea");
     const successArea = document.getElementById("checkoutSuccessArea");
-    
+
     const tabShipping = document.getElementById("tab-shipping");
     const tabPayment = document.getElementById("tab-payment");
     const tabConfirm = document.getElementById("tab-confirm");
@@ -1580,12 +1580,12 @@ function initCheckoutFlow() {
             alert("Your Shopping bag is empty.");
             return;
         }
-        
+
         // Hide cart drawer, open checkout drawer
         closeCartDrawer();
         checkoutDrawer.classList.add("active");
         cartOverlay.classList.add("active"); // keep overlay visible
-        
+
         // Reset states
         resetCheckoutDrawer();
     });
@@ -1601,11 +1601,11 @@ function initCheckoutFlow() {
         paymentArea.classList.add("hidden");
         reviewArea.classList.add("hidden");
         successArea.classList.add("hidden");
-        
+
         tabShipping.style.color = "var(--accent-gold)";
         tabPayment.style.color = "var(--text-muted)";
         tabConfirm.style.color = "var(--text-muted)";
-        
+
         // Auto pre-fill if logged in
         if (currentUser) {
             const coEmail = document.getElementById("coEmail");
@@ -1613,7 +1613,7 @@ function initCheckoutFlow() {
             if (coEmail) coEmail.value = currentUser.email;
             if (coName) coName.value = currentUser.name;
         }
-        
+
         updateShippingCost();
     }
 
@@ -1628,7 +1628,7 @@ function initCheckoutFlow() {
 
     function updateShippingCost() {
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-        
+
         // Free shipping above ₹1,500 (or equivalent in other currencies)
         const freeShippingThreshold = 1500.0;
         if (subtotal >= freeShippingThreshold) {
@@ -1649,7 +1649,7 @@ function initCheckoutFlow() {
     // Phase 1 -> Phase 2
     shippingForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        
+
         checkoutState.email = document.getElementById("coEmail").value;
         checkoutState.name = document.getElementById("coName").value;
         checkoutState.address = document.getElementById("coAddress").value;
@@ -1660,7 +1660,7 @@ function initCheckoutFlow() {
         // Hide Phase 1, Show Phase 2
         shippingForm.classList.add("hidden");
         paymentArea.classList.remove("hidden");
-        
+
         tabShipping.style.color = "var(--text-secondary)";
         tabPayment.style.color = "var(--accent-gold)";
     });
@@ -1694,7 +1694,7 @@ function initCheckoutFlow() {
         tabPayment.style.color = "var(--text-muted)";
         tabShipping.style.color = "var(--accent-gold)";
     });
-    
+
     document.getElementById("btnBackToShippingPaypal").addEventListener("click", () => {
         paymentArea.classList.add("hidden");
         shippingForm.classList.remove("hidden");
@@ -1735,7 +1735,7 @@ function initCheckoutFlow() {
         checkoutState.paymentMethod = "PayPal";
         proceedToReview();
     });
-    
+
     document.getElementById("btnSimulateApplePay").addEventListener("click", () => {
         checkoutState.paymentMethod = "Apple Pay";
         proceedToReview();
@@ -1744,25 +1744,25 @@ function initCheckoutFlow() {
     function proceedToReview() {
         paymentArea.classList.add("hidden");
         reviewArea.classList.remove("hidden");
-        
+
         tabPayment.style.color = "var(--text-secondary)";
         tabConfirm.style.color = "var(--accent-gold)";
-        
+
         // Populate Order Review
         document.getElementById("reviewDestName").textContent = checkoutState.name;
-        document.getElementById("reviewDestAddress").textContent = `${ checkoutState.address }, ${ checkoutState.city } ${ checkoutState.zip }, ${ checkoutState.country }`;
-        
+        document.getElementById("reviewDestAddress").textContent = `${checkoutState.address}, ${checkoutState.city} ${checkoutState.zip}, ${checkoutState.country}`;
+
         const methodText = checkoutState.shippingMethod === "express" ? "Express Delivery (DHL/FedEx)" : "Standard Insured Delivery";
         let paymentText = "";
         if (checkoutState.paymentMethod === "card") {
             const cardNum = document.getElementById("cardNum").value;
             const last4 = cardNum.substring(cardNum.length - 4) || "4444";
-            paymentText = `Credit Card(ending in ${ last4 })`;
+            paymentText = `Credit Card(ending in ${last4})`;
         } else {
             paymentText = checkoutState.paymentMethod;
         }
-        document.getElementById("reviewMethodDetails").textContent = `${ methodText } & bull; ${ paymentText } `;
-        
+        document.getElementById("reviewMethodDetails").textContent = `${methodText} & bull; ${paymentText} `;
+
         // Render item list
         const reviewList = document.getElementById("reviewItemsList");
         reviewList.innerHTML = cart.map(item => `
@@ -1771,12 +1771,12 @@ function initCheckoutFlow() {
                 <span>${formatPrice(item.price * item.qty)}</span>
             </div >
                 `).join("");
-        
+
         // Price summaries
         const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
         const taxVal = subtotal * 0.20; // 20% taxes
         const totalVal = subtotal + checkoutState.shippingCost + taxVal;
-        
+
         document.getElementById("reviewSubtotal").textContent = formatPrice(subtotal);
         document.getElementById("reviewShippingCost").textContent = checkoutState.shippingCost === 0 ? "FREE" : formatPrice(checkoutState.shippingCost);
         document.getElementById("reviewTax").textContent = formatPrice(taxVal);
@@ -1826,7 +1826,7 @@ function initCheckoutFlow() {
         };
 
         // Call backend API with fetch, fallback to offline local logic on error
-        fetch(`${ BACKEND_URL } 'https://nailss-luxe-backend.onrender.com/api/orders', {
+        fetch(`${BACKEND_URL} 'https://nailss-luxe-backend.onrender.com/api/orders', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1890,7 +1890,7 @@ function initCheckoutFlow() {
 }
 
 function loadProductsFromBackend() {
-    fetch(`${BACKEND_URL}/api/products`)
+    fetch(`${ BACKEND_URL } / api / products`)
         .then(res => {
             if (!res.ok) throw new Error("Catalog fetch failed");
             return res.json();
@@ -1970,7 +1970,7 @@ function initAuth() {
             authLoggedInState.style.display = "block";
 
             dashboardAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            dashboardTitle.textContent = `Bonjour, ${currentUser.name}!`;
+            dashboardTitle.textContent = `Bonjour, ${ currentUser.name }!`;
             dashboardEmail.textContent = currentUser.email;
 
             // Pre-fill checkout fields if they exist
@@ -2007,16 +2007,17 @@ function initAuth() {
 
     function fetchOrderHistory() {
         if (!currentUser) return;
-        dashboardOrderList.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;">Loading order history...</p>`;
+        dashboardOrderList.innerHTML = `< p style = "font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;" > Loading order history...</p > `;
 
-        fetch(`${BACKEND_URL}/api/orders/customer?email=${encodeURIComponent(currentUser.email)}`)
+        fetch(`${ BACKEND_URL } / api / orders / customer ? email = ${ encodeURIComponent(currentUser.email)
+    }`)
             .then(res => {
                 if (!res.ok) throw new Error("Failed to load orders");
                 return res.json();
             })
             .then(orders => {
                 if (!Array.isArray(orders) || orders.length === 0) {
-                    dashboardOrderList.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;">No orders placed yet. Design your bespoke set today! 💅</p>`;
+                    dashboardOrderList.innerHTML = `< p style = "font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;" > No orders placed yet.Design your bespoke set today! 💅</p > `;
                     return;
                 }
 
@@ -2028,10 +2029,10 @@ function initAuth() {
                     });
 
                     // Construct items description
-                    const itemsDesc = order.items.map(item => `${item.qty}x ${item.name} (${item.shape}, ${item.length})`).join('<br>');
+                    const itemsDesc = order.items.map(item => `${ item.qty }x ${ item.name }(${ item.shape }, ${ item.length })`).join('<br>');
 
                     return `
-                        <div class="order-history-card">
+    < div class= "order-history-card" >
                             <div class="order-card-header">
                                 <span class="order-card-id">${order.orderId}</span>
                                 <span class="order-card-date">${date}</span>
@@ -2043,13 +2044,13 @@ function initAuth() {
                                 <span class="order-card-status">Paid</span>
                                 <span class="order-card-total">${formatPrice(order.total)}</span>
                             </div>
-                        </div>
-                    `;
+                        </div >
+        `;
                 }).join("");
             })
             .catch(err => {
                 console.error("Order history fetch error:", err);
-                dashboardOrderList.innerHTML = `<p style="font-size: 0.8rem; color: #e57373; font-style: italic; text-align: center;">Unable to load order history.</p>`;
+                dashboardOrderList.innerHTML = `< p style = "font-size: 0.8rem; color: #e57373; font-style: italic; text-align: center;" > Unable to load order history.</p > `;
             });
     }
 
@@ -2098,7 +2099,7 @@ function initAuth() {
         loginStatus.style.color = "var(--text-secondary)";
         loginStatus.textContent = "Logging in...";
 
-        fetch(`${BACKEND_URL}/api/auth/login`, {
+        fetch(`${ BACKEND_URL } / api / auth / login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -2150,7 +2151,7 @@ function initAuth() {
             return;
         }
 
-        fetch(`${BACKEND_URL}/api/auth/register`, {
+        fetch(`${ BACKEND_URL } / api / auth / register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
