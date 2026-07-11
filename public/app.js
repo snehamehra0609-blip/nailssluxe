@@ -2,6 +2,10 @@
    NAILSS LUXE - APPLICATION ENGINE
    ========================================== */
 
+const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? '' 
+  : 'https://YOUR_LIVE_BACKEND_URL_HERE';
+
 // 1. DATA AND STATES
 let PRODUCTS_DATA = [
     {
@@ -1161,7 +1165,7 @@ function initSupport() {
 
             const inquiryPayload = { name, email, orderRef, message };
 
-            fetch('/api/inquiries', {
+            fetch(`${BACKEND_URL}/api/inquiries`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -1822,7 +1826,7 @@ function initCheckoutFlow() {
         };
 
         // Call backend API with fetch, fallback to offline local logic on error
-        fetch('/api/orders', {
+        fetch(`${BACKEND_URL}/api/orders`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1886,7 +1890,7 @@ function initCheckoutFlow() {
 }
 
 function loadProductsFromBackend() {
-    fetch('/api/products')
+    fetch(`${BACKEND_URL}/api/products`)
         .then(res => {
             if (!res.ok) throw new Error("Catalog fetch failed");
             return res.json();
@@ -2005,7 +2009,7 @@ function initAuth() {
         if (!currentUser) return;
         dashboardOrderList.innerHTML = `<p style="font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;">Loading order history...</p>`;
         
-        fetch(`/api/orders/customer?email=${encodeURIComponent(currentUser.email)}`)
+        fetch(`${BACKEND_URL}/api/orders/customer?email=${encodeURIComponent(currentUser.email)}`)
             .then(res => {
                 if (!res.ok) throw new Error("Failed to load orders");
                 return res.json();
@@ -2094,7 +2098,7 @@ function initAuth() {
         loginStatus.style.color = "var(--text-secondary)";
         loginStatus.textContent = "Logging in...";
 
-fetch('/api/auth/login', {            method: 'POST',
+        fetch(`${BACKEND_URL}/api/auth/login`, {            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         })
@@ -2145,7 +2149,7 @@ fetch('/api/auth/login', {            method: 'POST',
             return;
         }
 
-       fetch('/api/auth/register', {
+        fetch(`${BACKEND_URL}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })

@@ -2,28 +2,54 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const crypto = require('crypto');
+const fs = require('fs');
+const mongoose = require('mongoose');
 
-const connectDB = require('./config/db');
-const User = require('./models/User');
+// Import Mongoose Models
+const Product = require('./models/Product');
 const Order = require('./models/Order');
 const Inquiry = require('./models/Inquiry');
-const Product = require('./models/Product');
-const jsonDb = require('./config/jsonDb');
-
-let useJsonFallback = false;
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable CORS and JSON parsing
+// Enable CORS and JSON body parsing
 app.use(cors());
 app.use(express.json());
 
-// Serve static frontend files (html, css, js, assets)
-app.use(express.static(path.join(__dirname)));
+// Serve static frontend files from 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Simulated local product database for seeding
+// Paths to local JSON databases
+const inquiriesPath = path.join(__dirname, 'inquiries.json');
+const ordersPath = path.join(__dirname, 'orders.json');
+
+// Helper to read JSON file safely
+function readJsonFile(filePath) {
+    try {
+        if (!fs.existsSync(filePath)) {
+            return [];
+        }
+        const data = fs.readFileSync(filePath, 'utf8');
+        return JSON.parse(data || '[]');
+    } catch (err) {
+        console.error(`Error reading ${filePath}:`, err);
+        return [];
+    }
+}
+
+// Helper to write JSON file safely
+function writeJsonFile(filePath, data) {
+    try {
+        fs.writeFileSync(filePath, JSON.stringify(data, null, 4), 'utf8');
+        return true;
+    } catch (err) {
+        console.error(`Error writing ${filePath}:`, err);
+        return false;
+    }
+}
+
+// Simulated local product database for seeding and fallback
 const PRODUCTS_DATABASE = [
     {
         id: "p1",
@@ -157,64 +183,95 @@ const PRODUCTS_DATABASE = [
     }
 ];
 
-// Seed database with default products if empty
-const seedProducts = async () => {
+// Mongoose Connection Logic with Graceful Fallback
+let isDbConnected = false;
+
+async function connectDatabase() {
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+        console.warn("WARNING: MONGODB_URI environment variable is missing.");
+        console.log("Gracefully falling back to local file storage for write operations.");
+        return;
+    }
+
+    try {
+        await mongoose.connect(mongoUri, {
+            serverSelectionTimeoutMS: 3000
+        });
+        isDbConnected = true;
+        console.log("Successfully connected to MongoDB.");
+        
+        // Seed default products if database is empty
+        await seedProducts();
+    } catch (err) {
+        console.error(`Database Connection Error: ${err.message}`);
+        console.log("Gracefully falling back to local file storage for write operations.");
+    }
+}
+
+// Seed Database Function
+async function seedProducts() {
     try {
         const count = await Product.countDocuments();
         if (count === 0) {
             await Product.insertMany(PRODUCTS_DATABASE);
             console.log("Database successfully seeded with default products.");
         }
-    } catch (e) {
-        console.error("Failed to seed products database:", e);
+    } catch (err) {
+        console.error("Failed to seed default products into MongoDB:", err);
     }
-};
+}
 
-// API: Get products catalog from MongoDB
-app.get('/api/products', async (req, res) => {
-    try {
-        if (useJsonFallback) {
-            return res.json(PRODUCTS_DATABASE);
-        }
-        const products = await Product.find({});
-        res.json(products);
-    } catch (e) {
-        console.error("Error fetching products:", e);
-        res.status(500).json({ error: "Failed to fetch products" });
-    }
-});
+// --- API ENDPOINTS ---
 
-// API: Save support inquiry to MongoDB
+// 1. POST /api/inquiries
 app.post('/api/inquiries', async (req, res) => {
     const { name, email, orderRef, message } = req.body;
     
     if (!name || !email || !message) {
         return res.status(400).json({ error: "Missing required fields (name, email, message)" });
     }
-    
-    try {
-        const inquiryId = "inq_" + Date.now();
-        if (useJsonFallback) {
-            jsonDb.saveInquiry({ inquiryId, name, email, orderRef, message });
-            return res.status(201).json({ success: true, message: "Inquiry saved successfully", inquiryId });
+
+    const inquiryId = "inq_" + Date.now();
+    const newInquiry = {
+        id: inquiryId,
+        timestamp: new Date().toISOString(),
+        name,
+        email: email.toLowerCase(),
+        orderRef: orderRef || "N/A",
+        message
+    };
+
+    // Append to local inquiries.json
+    const inquiries = readJsonFile(inquiriesPath);
+    inquiries.push(newInquiry);
+    writeJsonFile(inquiriesPath, inquiries);
+
+    // Save to MongoDB if connected
+    if (isDbConnected) {
+        try {
+            const dbInquiry = new Inquiry({
+                inquiryId,
+                name,
+                email: email.toLowerCase(),
+                orderRef: orderRef || "N/A",
+                message
+            });
+            await dbInquiry.save();
+            console.log(`Inquiry ${inquiryId} successfully saved to MongoDB.`);
+        } catch (err) {
+            console.error("Failed to save inquiry to MongoDB:", err.message);
         }
-        const newInquiry = new Inquiry({
-            inquiryId,
-            name,
-            email: email.toLowerCase(),
-            orderRef: orderRef || "N/A",
-            message
-        });
-        
-        await newInquiry.save();
-        res.status(201).json({ success: true, message: "Inquiry saved successfully", inquiryId });
-    } catch (e) {
-        console.error("Error saving inquiry:", e);
-        res.status(500).json({ error: "Failed to persist inquiry to database storage" });
     }
+
+    res.status(201).json({
+        success: true,
+        message: "Inquiry saved successfully",
+        inquiryId
+    });
 });
 
-// API: Save order invoice to MongoDB
+// 2. POST /api/orders
 app.post('/api/orders', async (req, res) => {
     const {
         orderId,
@@ -232,185 +289,149 @@ app.post('/api/orders', async (req, res) => {
         tax,
         total
     } = req.body;
-    
+
     if (!email || !name || !address || !items || !items.length) {
         return res.status(400).json({ error: "Invalid order details or empty shopping bag" });
     }
-    
-    try {
-        const finalOrderId = orderId || ("NL-" + Math.floor(10000 + Math.random() * 90000));
-        const orderData = {
-            orderId: finalOrderId,
-            customer: {
-                email: email.toLowerCase(),
-                name,
-                address,
-                city,
-                zip,
-                country
-            },
-            shippingMethod,
-            shippingCost,
-            paymentMethod,
-            items,
-            subtotal,
-            tax,
-            total
-        };
-        if (useJsonFallback) {
-            jsonDb.saveOrder(orderData);
-            return res.status(201).json({ success: true, message: "Order processed successfully", orderId: finalOrderId });
+
+    const finalOrderId = orderId || ("NL-" + Math.floor(10000 + Math.random() * 90000));
+    const orderData = {
+        orderId: finalOrderId,
+        timestamp: new Date().toISOString(),
+        customer: {
+            email: email.toLowerCase(),
+            name,
+            address,
+            city,
+            zip,
+            country
+        },
+        shippingMethod,
+        shippingCost,
+        paymentMethod,
+        items,
+        subtotal,
+        tax,
+        total
+    };
+
+    // Append to local orders.json
+    const orders = readJsonFile(ordersPath);
+    orders.push(orderData);
+    writeJsonFile(ordersPath, orders);
+
+    // Save to MongoDB if connected
+    if (isDbConnected) {
+        try {
+            const dbOrder = new Order(orderData);
+            await dbOrder.save();
+            console.log(`Order ${finalOrderId} successfully saved to MongoDB.`);
+        } catch (err) {
+            console.error("Failed to save order to MongoDB:", err.message);
         }
-        const newOrder = new Order(orderData);
-        await newOrder.save();
-        res.status(201).json({ success: true, message: "Order processed successfully", orderId: finalOrderId });
-    } catch (e) {
-        console.error("Error saving order:", e);
-        res.status(500).json({ error: "Failed to process order invoices in database storage" });
     }
+
+    res.status(201).json({
+        success: true,
+        message: "Order processed successfully",
+        orderId: finalOrderId
+    });
 });
 
-// Password hashing helper
-function hashPassword(password, salt) {
-    return crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha256').toString('hex');
-}
+// 3. GET /api/products (Fallback return or handle database logs)
+app.get('/api/products', async (req, res) => {
+    if (isDbConnected) {
+        try {
+            const products = await Product.find({});
+            console.log("Successfully fetched products catalog from MongoDB database.");
+            return res.json(products);
+        } catch (err) {
+            console.error("Error fetching products from MongoDB:", err.message);
+            console.log("Serving product catalog from fallback local data.");
+        }
+    } else {
+        console.log("Serving product catalog from fallback local data (MongoDB not connected).");
+    }
+    
+    // Fallback response
+    res.json(PRODUCTS_DATABASE);
+});
 
-// API: Register User in MongoDB
-app.post('/api/auth/register', async (req, res) => {
+// 4. POST /api/auth/login and /api/auth/register (Simulate mock authentication responses with success states)
+app.post('/api/auth/register', (req, res) => {
     const { name, email, password } = req.body;
     if (!name || !email || !password) {
         return res.status(400).json({ error: "Missing required fields (name, email, password)" });
     }
 
-    try {
-        // Check if email already registered
-        let exists;
-        if (useJsonFallback) {
-            exists = jsonDb.findUserByEmail(email);
-        } else {
-            exists = await User.findOne({ email: email.toLowerCase() });
-        }
-        if (exists) {
-            return res.status(400).json({ error: "Email is already registered" });
-        }
+    console.log(`Mock registration requested for: ${email}`);
 
-        const salt = crypto.randomBytes(16).toString('hex');
-        const hashedPassword = hashPassword(password, salt);
-
-        if (useJsonFallback) {
-            const newUser = jsonDb.saveUser({
-                name,
-                email: email.toLowerCase(),
-                salt,
-                password: hashedPassword
-            });
-            return res.status(201).json({
-                success: true,
-                user: {
-                    id: newUser.id,
-                    name: newUser.name,
-                    email: newUser.email
-                }
-            });
-        }
-
-        const newUser = new User({
+    // Return mock successful user payload response
+    res.status(201).json({
+        success: true,
+        user: {
+            id: "usr_" + Math.random().toString(36).substr(2, 9),
             name,
-            email: email.toLowerCase(),
-            salt,
-            password: hashedPassword
-        });
-
-        await newUser.save();
-
-        res.status(201).json({
-            success: true,
-            user: {
-                id: newUser._id,
-                name: newUser.name,
-                email: newUser.email
-            }
-        });
-    } catch (e) {
-        console.error("Error saving user:", e);
-        res.status(500).json({ error: "Failed to persist registration data" });
-    }
+            email: email.toLowerCase()
+        }
+    });
 });
 
-// API: Login User in MongoDB
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
         return res.status(400).json({ error: "Missing email or password" });
     }
 
-    try {
-        let user;
-        if (useJsonFallback) {
-            user = jsonDb.findUserByEmail(email);
-        } else {
-            user = await User.findOne({ email: email.toLowerCase() });
-        }
-        if (!user) {
-            return res.status(401).json({ error: "Invalid email or password" });
-        }
+    console.log(`Mock login requested for: ${email}`);
 
-        const checkHash = hashPassword(password, user.salt);
-        if (checkHash !== user.password) {
-            return res.status(401).json({ error: "Invalid email or password" });
+    // Return mock successful user payload response with token
+    res.json({
+        success: true,
+        token: "auth_tok_" + Math.random().toString(36).substr(2, 9),
+        user: {
+            id: "usr_mock123",
+            name: "Mock User",
+            email: email.toLowerCase()
         }
-
-        // Mock token
-        const token = "auth_tok_" + crypto.randomBytes(16).toString('hex');
-
-        res.json({
-            success: true,
-            token: token,
-            user: {
-                id: user._id || user.id,
-                name: user.name,
-                email: user.email
-            }
-        });
-    } catch (e) {
-        console.error("Error logging in user:", e);
-        return res.status(500).json({ error: "Internal server error" });
-    }
+    });
 });
 
-// API: Get customer order history from MongoDB
+// 5. GET /api/orders/customer (Fetch order history for the dashboard)
 app.get('/api/orders/customer', async (req, res) => {
     const { email } = req.query;
     if (!email) {
         return res.status(400).json({ error: "Email query parameter is required" });
     }
 
-    try {
-        if (useJsonFallback) {
-            const customerOrders = jsonDb.getCustomerOrders(email);
+    if (isDbConnected) {
+        try {
+            const customerOrders = await Order.find({ "customer.email": email.toLowerCase() })
+                                               .sort({ timestamp: -1 });
+            console.log(`Successfully fetched ${customerOrders.length} customer orders from MongoDB.`);
             return res.json(customerOrders);
+        } catch (err) {
+            console.error("Error reading orders from MongoDB:", err.message);
+            console.log("Falling back to reading customer orders from local files.");
         }
-        const customerOrders = await Order.find({ "customer.email": email.toLowerCase() })
-                                           .sort({ timestamp: -1 });
-        res.json(customerOrders);
-    } catch (e) {
-        console.error("Error reading orders from database:", e);
-        res.status(500).json({ error: "Internal server error" });
     }
+
+    const orders = readJsonFile(ordersPath);
+    const filteredOrders = orders
+        .filter(order => order.customer && order.customer.email && order.customer.email.toLowerCase() === email.toLowerCase())
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    res.json(filteredOrders);
 });
 
-// Connect to Database and start server
-connectDB()
-    .then(() => {
-        console.log("Using MongoDB storage.");
-        seedProducts();
-    })
-    .catch((err) => {
-        console.warn("MongoDB connection failed. Falling back to local JSON database storage.");
-        useJsonFallback = true;
-    })
-    .finally(() => {
-        app.listen(PORT, () => {
-            console.log(`Nailss Luxe backend service running locally at http://localhost:${PORT}`);
-        });
+// 6. Wildcard route to send back public/index.html for frontend tab-routing
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Connect to database and start Express server
+connectDatabase().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Express server running locally at http://localhost:${PORT}`);
     });
+});

@@ -1,0 +1,10 @@
+{
+  "src": [
+    "index.html",
+    "styles.css",
+    "app.js",
+    "assets/**/*",
+    "inquiries.json",
+    "orders.json"
+  ]
+}
