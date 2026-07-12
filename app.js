@@ -4,7 +4,7 @@
 
 const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? ''
-    : 'https://YOUR_LIVE_BACKEND_URL_HERE';
+    : 'https://nailss-luxe-backend.onrender.com';
 
 // 1. DATA AND STATES
 let PRODUCTS_DATA = [
@@ -1890,7 +1890,7 @@ function initCheckoutFlow() {
 }
 
 function loadProductsFromBackend() {
-    fetch(`${BACKEND_URL} / api / products`)
+    fetch(`${BACKEND_URL}/api/products`)
         .then(res => {
             if (!res.ok) throw new Error("Catalog fetch failed");
             return res.json();
@@ -2009,8 +2009,7 @@ function initAuth() {
         if (!currentUser) return;
         dashboardOrderList.innerHTML = `< p style = "font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;" > Loading order history...</p > `;
 
-        fetch(`${BACKEND_URL} / api / orders / customer ? email = ${encodeURIComponent(currentUser.email)
-            }`)
+        fetch(`${BACKEND_URL}/api/orders/customer?email=${encodeURIComponent(currentUser.email)}`)
             .then(res => {
                 if (!res.ok) throw new Error("Failed to load orders");
                 return res.json();
@@ -2099,7 +2098,7 @@ function initAuth() {
         loginStatus.style.color = "var(--text-secondary)";
         loginStatus.textContent = "Logging in...";
 
-        fetch(`${BACKEND_URL} / api / auth / login`, {
+        fetch(`${BACKEND_URL}/api/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -2151,7 +2150,7 @@ function initAuth() {
             return;
         }
 
-        fetch(`${BACKEND_URL} / api / auth / register`, {
+        fetch(`${BACKEND_URL}/api/auth/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
