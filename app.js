@@ -1826,13 +1826,13 @@ function initCheckoutFlow() {
         };
 
         // Call backend API with fetch, fallback to offline local logic on error
-        fetch(`${BACKEND_URL} 'https://nailss-luxe-backend.onrender.com/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderPayload)
-            })
+        fetch(`${BACKEND_URL || 'https://nailss-luxe-backend.onrender.com'}/api/orders`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(orderPayload)
+        })
             .then(response => {
                 if (!response.ok) throw new Error("Server error");
                 return response.json();
@@ -1890,7 +1890,7 @@ function initCheckoutFlow() {
 }
 
 function loadProductsFromBackend() {
-    fetch(`${ BACKEND_URL } / api / products`)
+    fetch(`${BACKEND_URL} / api / products`)
         .then(res => {
             if (!res.ok) throw new Error("Catalog fetch failed");
             return res.json();
@@ -1970,7 +1970,7 @@ function initAuth() {
             authLoggedInState.style.display = "block";
 
             dashboardAvatar.textContent = currentUser.name.charAt(0).toUpperCase();
-            dashboardTitle.textContent = `Bonjour, ${ currentUser.name }!`;
+            dashboardTitle.textContent = `Bonjour, ${currentUser.name}!`;
             dashboardEmail.textContent = currentUser.email;
 
             // Pre-fill checkout fields if they exist
@@ -2009,8 +2009,8 @@ function initAuth() {
         if (!currentUser) return;
         dashboardOrderList.innerHTML = `< p style = "font-size: 0.8rem; color: var(--text-muted); font-style: italic; text-align: center;" > Loading order history...</p > `;
 
-        fetch(`${ BACKEND_URL } / api / orders / customer ? email = ${ encodeURIComponent(currentUser.email)
-    }`)
+        fetch(`${BACKEND_URL} / api / orders / customer ? email = ${encodeURIComponent(currentUser.email)
+            }`)
             .then(res => {
                 if (!res.ok) throw new Error("Failed to load orders");
                 return res.json();
@@ -2029,7 +2029,7 @@ function initAuth() {
                     });
 
                     // Construct items description
-                    const itemsDesc = order.items.map(item => `${ item.qty }x ${ item.name }(${ item.shape }, ${ item.length })`).join('<br>');
+                    const itemsDesc = order.items.map(item => `${item.qty}x ${item.name}(${item.shape}, ${item.length})`).join('<br>');
 
                     return `
     < div class= "order-history-card" >
@@ -2099,7 +2099,7 @@ function initAuth() {
         loginStatus.style.color = "var(--text-secondary)";
         loginStatus.textContent = "Logging in...";
 
-        fetch(`${ BACKEND_URL } / api / auth / login`, {
+        fetch(`${BACKEND_URL} / api / auth / login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -2151,7 +2151,7 @@ function initAuth() {
             return;
         }
 
-        fetch(`${ BACKEND_URL } / api / auth / register`, {
+        fetch(`${BACKEND_URL} / api / auth / register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
