@@ -1,0 +1,26 @@
+[
+    {
+        "id": "inq_1782406977467",
+        "timestamp": "2026-06-25T17:02:57.469Z",
+        "name": "Test User",
+        "email": "test@example.com",
+        "orderRef": "N/A",
+        "message": "Hello, this is a test message. Please reply."
+    },
+    {
+        "id": "inq_1782415099428",
+        "timestamp": "2026-06-25T19:18:19.428Z",
+        "name": "Test User",
+        "email": "test@example.com",
+        "orderRef": "ftghutfrhg",
+        "message": "hgytrfyghujytgf"
+    },
+    {
+        "id": "inq_1782919846625",
+        "timestamp": "2026-07-01T15:30:46.628Z",
+        "name": "API Test User",
+        "email": "test_1782919846587@example.com",
+        "orderRef": "N/A",
+        "message": "Hello, this is an automated verification message."
+    }
+]
