@@ -14,7 +14,13 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Enable CORS and JSON body parsing
-app.use(cors());
+// Remove app.use(cors()); and replace it with this exact block:
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 app.use(express.json());
 
 // Serve static frontend files from 'public' directory
@@ -200,7 +206,7 @@ async function connectDatabase() {
         });
         isDbConnected = true;
         console.log("Successfully connected to MongoDB.");
-        
+
         // Seed default products if database is empty
         await seedProducts();
     } catch (err) {
@@ -227,7 +233,7 @@ async function seedProducts() {
 // 1. POST /api/inquiries
 app.post('/api/inquiries', async (req, res) => {
     const { name, email, orderRef, message } = req.body;
-    
+
     if (!name || !email || !message) {
         return res.status(400).json({ error: "Missing required fields (name, email, message)" });
     }
@@ -352,7 +358,7 @@ app.get('/api/products', async (req, res) => {
     } else {
         console.log("Serving product catalog from fallback local data (MongoDB not connected).");
     }
-    
+
     // Fallback response
     res.json(PRODUCTS_DATABASE);
 });
@@ -407,7 +413,7 @@ app.get('/api/orders/customer', async (req, res) => {
     if (isDbConnected) {
         try {
             const customerOrders = await Order.find({ "customer.email": email.toLowerCase() })
-                                               .sort({ timestamp: -1 });
+                .sort({ timestamp: -1 });
             console.log(`Successfully fetched ${customerOrders.length} customer orders from MongoDB.`);
             return res.json(customerOrders);
         } catch (err) {
