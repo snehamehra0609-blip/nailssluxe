@@ -2098,7 +2098,7 @@ function initAuth() {
         loginStatus.style.color = "var(--text-secondary)";
         loginStatus.textContent = "Logging in...";
 
-        fetch(`${BACKEND_URL}/api/auth/login`, {
+        fetch('https://nailss-luxe-backend.onrender.com/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
@@ -2150,7 +2150,7 @@ function initAuth() {
             return;
         }
 
-        fetch(`${BACKEND_URL}/api/auth/register`, {
+        fetch('https://nailss-luxe-backend.onrender.com/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password })
