@@ -21,14 +21,20 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
-// =======================================================
-// 2. PASTE THE NEW PREFLIGHT INTERCEPTOR RIGHT HERE!
-// =======================================================
-app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
+// Remove the old app.use(cors(...)) and app.options(...) blocks.
+// Put this absolute header injector right after "const app = express();":
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://snehamehra0609-blip.github.io');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    return res.sendStatus(200);
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    // Instantly intercept browser preflight OPTIONS handshakes right here
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200);
+    }
+    next();
 });
 app.use(express.json());
 
